@@ -3,7 +3,7 @@ from flask_pymongo import PyMongo
 from bson import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='flask_mongo_crud_alumnos/templates')
 app.secret_key = "clave_secreta_segura"
 
 # 🔹 URI de MongoDB (local o Atlas)
