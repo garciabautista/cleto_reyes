@@ -65,7 +65,7 @@
 
           <hr>
 
-          <form action="{{ url_for('procesar_pago') }}" method="POST">
+          <form id="formPago" action="{{ url_for('procesar_pago') }}" method="POST">
             <div class="mb-3">
               <label for="tarjeta" class="form-label">Número de tarjeta</label>
               <input type="text" id="tarjeta" class="form-control" placeholder="**** **** **** 1234" required>
@@ -87,5 +87,17 @@
       </div>
     </div>
   </div>
+
+  <!-- SCRIPT PARA MOSTRAR ALERTA -->
+  <script>
+    document.getElementById("formPago").addEventListener("submit", function(event) {
+      event.preventDefault();  // Evita enviar el formulario inmediatamente
+      
+      alert("✅ Pago exitoso\nGracias por tu compra.");
+      
+      this.submit();  // Ahora sí envía el formulario
+    });
+  </script>
 </body>
 </html>
+
