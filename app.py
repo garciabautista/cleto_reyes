@@ -6,8 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__, template_folder='flask_mongo_crud_alumnos/templates')
 app.secret_key = "clave_secreta_segura"
 
-# 🔹 URI de MongoDB (local o Atlas)
-# Para Atlas: mongodb+srv://usuario:contraseña@cluster0.xxxxx.mongodb.net/cleto_reyes
+# 🔹 URI de MongoDB (Atlas)
 app.config["MONGO_URI"] = "mongodb+srv://cleto:G123456789@cluster0.lchkp7j.mongodb.net/cleto_reyes"
 mongo = PyMongo(app)
 
@@ -77,7 +76,7 @@ def agregar_carrito(producto_id):
 
     carrito = session.get('carrito', [])
 
-    # Buscar si el producto ya está en el carrito
+    # Ver si ya está en el carrito
     for item in carrito:
         if item['producto_id'] == str(producto['_id']):
             item['cantidad'] += 1
@@ -130,7 +129,7 @@ def eliminar_del_carrito(producto_id):
     flash("🗑️ Producto eliminado del carrito.")
     return redirect(url_for('carrito'))
 
-# ------------------- PAGO (GET) -------------------
+# ------------------- PAGO -------------------
 
 @app.route('/pago', methods=['GET'])
 def pago():
@@ -148,7 +147,7 @@ def pago():
     total = sum(item['precio'] * item['cantidad'] for item in carrito)
     return render_template('pago.html', carrito=carrito, total=total, usuario=usuario)
 
-# ------------------- PROCESAR PAGO (POST) -------------------
+# ------------------- PROCESAR PAGO -------------------
 
 @app.route('/procesar_pago', methods=['POST'])
 def procesar_pago():
@@ -160,15 +159,29 @@ def procesar_pago():
         flash("⚠️ Error: no hay usuario o el carrito está vacío.")
         return redirect(url_for('inicio'))
 
+    # DATOS DE ENVÍO
+    direccion = request.form.get('direccion')
+    ciudad = request.form.get('ciudad')
+    estado = request.form.get('estado')
+    cp = request.form.get('cp')
+    telefono = request.form.get('telefono')
+
     total = sum(float(item['precio']) * item['cantidad'] for item in carrito)
 
-    # Guardar el pedido en MongoDB
+    # GUARDAR PEDIDO EN MONGO
     mongo.db.pedidos.insert_one({
         'usuario': usuario,
         'usuario_id': usuario_id,
         'productos': carrito,
         'total': total,
-        'estado': 'Pagado'
+        'estado': 'Pagado',
+        'envio': {
+            'direccion': direccion,
+            'ciudad': ciudad,
+            'estado': estado,
+            'cp': cp,
+            'telefono': telefono
+        }
     })
 
     # Vaciar carrito
@@ -181,4 +194,3 @@ def procesar_pago():
 
 if __name__ == '__main__':
     app.run(debug=True)
-5
